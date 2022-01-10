@@ -31,18 +31,6 @@ export async function scrapeDiscipline() {
     const $ = await cheerio.load(html.data)
     const maneuvers = []
 
-
-    var maneuverPromises = [];
-    $('p').each(function (idx, elem) {
-        var article = new Article({ content: $(this).html() });
-        var promise = article.save();
-        promises.push(promise); // db save async function or other async function
-    });
-    Promise.all(promises)
-        .then(doSomethingOnSuccess)
-        .catch(doSomethingOnError)
-        .finally(mongoose.connection.close);
-
     $('table[class=wikitable]', '#content').each((i, table) => {
         $(table).find('tr').each(async (i, row) => {
             if (i > 0 && i < 2) {
@@ -50,11 +38,14 @@ export async function scrapeDiscipline() {
                 const name = $(firstCell).text().trim()
                 const link = `${baseUrl}${$(firstCell).children().attr('href')}`
                 const shortDesc = $(firstCell).next().next().text().trim()
-                const result = Object.assign(await scrapeManuever(link), { name, link, shortDesc })
                 maneuvers.push(result)
             }
         })
         return false
+    })
+    maneuvers.map(maneuver => {
+        const maneuverDetails = await scrapeManuever(link)
+        return Object.assign(maneuverDetails, maneuver)
     })
     return maneuvers
 }
