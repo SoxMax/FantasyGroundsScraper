@@ -25,14 +25,13 @@ export async function scrapeManuever(url) {
     return maneuverDetails
 }
 
-export async function scrapeDiscipline() {
-    const baseUrl = 'https://libraryofmetzofitz.fandom.com'
-    const html = await axios.get(`${baseUrl}/wiki/Black_Seraph`)
+export async function scrapeDiscipline(url) {
+    const html = await axios.get(url)
     const $ = await cheerio.load(html.data)
     const maneuvers = []
 
     $('table[class=wikitable]', '#content').each((i, table) => {
-        $(table).find('tr').each(async (i, row) => {
+        $(table).find('tr').each((i, row) => {
             if (i > 0 && i < 2) {
                 const firstCell = $(row).find('td').first()
                 const name = $(firstCell).text().trim()
@@ -41,17 +40,20 @@ export async function scrapeDiscipline() {
                 maneuvers.push({name, link, shortDesc})
             }
         })
-        return false
     })
-    maneuvers.map(async maneuver => {
+    return Promise.all(maneuvers.map(async maneuver => {
         const maneuverDetails = await scrapeManuever(maneuver.link)
         return Object.assign(maneuverDetails, maneuver)
-    })
-    return maneuvers
+    }))
 }
 
-export async function main() {
-    const results = await scrapeDiscipline()
+export async function scrapeDisciplines() {
+    const baseUrl = 'https://libraryofmetzofitz.fandom.com'
+    return await scrapeDiscipline(`${baseUrl}/wiki/Black_Seraph`)
+}
+
+export function main() {
+    const results = scrapeDiscipline()
     console.log(results)
 }
 
