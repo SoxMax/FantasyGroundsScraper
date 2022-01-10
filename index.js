@@ -1,38 +1,58 @@
+import fs from 'fs'
 import axios from 'axios'
 import cheerio from 'cheerio'
+
+const baseUrl = 'https://libraryofmetzofitz.fandom.com'
 
 function camalize(str) {
     return str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
 }
 
-export async function scrapeManuever(url) {
-    const html = await axios.get(url)
-    const $ = await cheerio.load(html.data)
-    const maneuverDetails = {}
-
-    $('div[class=mw-parser-output]', '#content').find('p').each((i, content) => {
-        if ($(content).find('b').text().trim()) {
-            $(content).text().trim().split(';').forEach(field => {
-                const splitField = field.split(':')
-                if (splitField.length > 1) {
-                    maneuverDetails[camalize(splitField[0].trim())] = splitField[1].trim()
-                }
-            })
-        } else {
-            maneuverDetails['description'] = $(content).text().trim()
-        }
+function cleanObject(obj) {
+    Object.keys(obj).forEach(key => {
+        obj[key] = obj[key].replace(/\u00A0/g, " ");
     })
-    return maneuverDetails
+    return obj
 }
 
-export async function scrapeDiscipline(url) {
+async function scrapeManuever(url, maneuver) {
+    if(url == 'https://libraryofmetzofitz.fandom.comundefined') {
+        console.log("scrapeManuever undefined url for ", maneuver.name)
+        console.log(url, maneuver.link)
+        return {}
+    } else {
+        const html = await axios.get(url)
+        const $ = await cheerio.load(html.data)
+        const maneuverDetails = {}
+
+        $('div[class=mw-parser-output]', '#content').find('p').each((i, content) => {
+            if ($(content).find('b').text().trim()) {
+                $(content).text().trim().split(';').forEach(field => {
+                    const splitField = field.split(':')
+                    if (splitField.length > 1) {
+                        maneuverDetails[camalize(splitField[0].trim())] = splitField[1].trim()
+                    }
+                })
+            } else {
+                maneuverDetails['description'] = $(content).text().trim()
+            }
+        })
+        return maneuverDetails
+    }
+}
+
+async function scrapeDiscipline(url) {
+    if(url == 'https://libraryofmetzofitz.fandom.comundefined') {
+        console.log("scrapeDiscipline undefined url")
+    }
     const html = await axios.get(url)
     const $ = await cheerio.load(html.data)
     const maneuvers = []
 
     $('table[class=wikitable]', '#content').each((i, table) => {
+        // console.log($(table).find('tr').html())
         $(table).find('tr').each((i, row) => {
-            if (i > 0 && i < 2) {
+            if (i > 0) {
                 const firstCell = $(row).find('td').first()
                 const name = $(firstCell).text().trim()
                 const link = `${baseUrl}${$(firstCell).children().attr('href')}`
@@ -42,19 +62,32 @@ export async function scrapeDiscipline(url) {
         })
     })
     return Promise.all(maneuvers.map(async maneuver => {
-        const maneuverDetails = await scrapeManuever(maneuver.link)
-        return Object.assign(maneuverDetails, maneuver)
+        // console.log(maneuver.name, maneuver.link)
+        const maneuverDetails = await scrapeManuever(maneuver.link, maneuver)
+        return cleanObject(Object.assign(maneuverDetails, maneuver))
     }))
 }
 
-export async function scrapeDisciplines() {
-    const baseUrl = 'https://libraryofmetzofitz.fandom.com'
-    return await scrapeDiscipline(`${baseUrl}/wiki/Black_Seraph`)
+async function scrapeDisciplines() {
+    const html = await axios.get(`${baseUrl}/wiki/Martial_Disciplines`)
+    const $ = await cheerio.load(html.data)
+    const disciplineLinks = []
+
+    $('table[class=wikitable]', '#content').find('tr').each((i, row) => {
+        if(i > 0) {
+            disciplineLinks.push(`${baseUrl}${$(row).find('td').first().children().attr('href')}`)
+        }
+    })
+    return Promise.all(disciplineLinks.map(async link => {
+        return await scrapeDiscipline(link)
+    }))
 }
 
-export function main() {
-    const results = scrapeDiscipline()
-    console.log(results)
+
+async function main() {
+    const results = await scrapeDiscipline("https://libraryofmetzofitz.fandom.com/wiki/Black_Seraph")
+    fs.writeFileSync("output.js", JSON.stringify(results, null, 2))
+    // console.log(results)
 }
 
 main()
