@@ -1,0 +1,23 @@
+{
+  "name": "fantasygroundsscraper",
+  "version": "1.0.0",
+  "description": "Tool for scraping websites into Fantasy Grounds modules",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoxMax/FantasyGroundsScraper.git"
+  },
+  "author": "SoxMax",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SoxMax/FantasyGroundsScraper/issues"
+  },
+  "homepage": "https://github.com/SoxMax/FantasyGroundsScraper#readme",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "cheerio": "^1.0.0-rc.10"
+  }
+}
