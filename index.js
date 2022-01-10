@@ -38,13 +38,13 @@ export async function scrapeDiscipline() {
                 const name = $(firstCell).text().trim()
                 const link = `${baseUrl}${$(firstCell).children().attr('href')}`
                 const shortDesc = $(firstCell).next().next().text().trim()
-                maneuvers.push(result)
+                maneuvers.push({name, link, shortDesc})
             }
         })
         return false
     })
-    maneuvers.map(maneuver => {
-        const maneuverDetails = await scrapeManuever(link)
+    maneuvers.map(async maneuver => {
+        const maneuverDetails = await scrapeManuever(maneuver.link)
         return Object.assign(maneuverDetails, maneuver)
     })
     return maneuvers
