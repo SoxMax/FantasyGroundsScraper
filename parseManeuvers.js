@@ -34,7 +34,7 @@ async function scrapeManuever(url, maneuver) {
                     }
                 })
             } else {
-                maneuverDetails['description'] = $(content).text().trim()
+                maneuverDetails['description'] = $(content).text().trim().replace(/[\r\n]+/g," ")
             }
         })
         return maneuverDetails
