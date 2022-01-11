@@ -1,7 +1,6 @@
 import fs from 'fs'
 import axios from 'axios'
 import cheerio from 'cheerio'
-import { XMLParser, XMLBuilder, XMLValidator } from 'fast-xml-parser'
 
 const baseUrl = 'https://libraryofmetzofitz.fandom.com'
 
