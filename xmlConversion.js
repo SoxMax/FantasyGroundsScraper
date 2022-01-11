@@ -76,8 +76,7 @@ function generateManeuverTuple(rawManeuver) {
     ]
 }
 
-function main() {
-    const maneuvers = JSON.parse(fs.readFileSync("output.json"))
+function convertManuversToXml(manuvers) {
     const convertedManeuvers = [Object.fromEntries(maneuvers.map(maneuver => generateManeuverTuple(maneuver)))]
 
     const options = {
@@ -87,7 +86,12 @@ function main() {
         arrayNodeName: "spelldesc"
     }
     const builder = new XMLBuilder(options)
-    const output = builder.build(convertedManeuvers)
+    return builder.build(convertedManeuvers)
+}
+
+function main() {
+    const maneuvers = JSON.parse(fs.readFileSync("output.json"))
+    const output = convertManuversToXml(maneuvers)
     fs.writeFileSync("output.xml", output)
 }
 
