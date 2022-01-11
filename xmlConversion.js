@@ -1,22 +1,6 @@
 import fs from 'fs'
 import { XMLParser, XMLBuilder, XMLValidator } from 'fast-xml-parser'
 
-function xmlExample() {
-    const XMLdata = fs.readFileSync("example.xml")
-    const options = {
-        ignoreAttributes: false,
-        attributeNamePrefix: "@@",
-        format: true
-    }
-    const parser = new XMLParser(options);
-    let result = parser.parse(XMLdata);
-    console.log(JSON.stringify(result, null, 4))
-    fs.writeFileSync("example.json", JSON.stringify(result, null, 4))
-
-    const builder = new XMLBuilder(options)
-    const output = builder.build(result)
-}
-
 function generateSpellId(name) {
     return name.replace(/[^A-Za-z0-9]/g, '').toLowerCase()
 }
@@ -107,5 +91,4 @@ function main() {
     fs.writeFileSync("output.xml", output)
 }
 
-// xmlExample()
 main()
