@@ -1,6 +1,7 @@
 import fs from 'fs'
 import axios from 'axios'
 import cheerio from 'cheerio'
+import { XMLParser, XMLBuilder, XMLValidator } from 'fast-xml-parser'
 
 const baseUrl = 'https://libraryofmetzofitz.fandom.com'
 
@@ -83,10 +84,9 @@ async function scrapeDisciplines() {
     }))
 }
 
-
 async function main() {
     const results = await scrapeDiscipline("https://libraryofmetzofitz.fandom.com/wiki/Black_Seraph")
-    fs.writeFileSync("output.js", JSON.stringify(results, null, 2))
+    fs.writeFileSync("output.json", JSON.stringify(results, null, 2))
     // console.log(results)
 }
 
