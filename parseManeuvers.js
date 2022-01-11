@@ -41,7 +41,7 @@ async function scrapeManuever(url, maneuver) {
     }
 }
 
-async function scrapeDiscipline(url) {
+export async function scrapeDiscipline(url) {
     if(url == 'https://libraryofmetzofitz.fandom.comundefined') {
         console.log("scrapeDiscipline undefined url")
     }
@@ -68,7 +68,7 @@ async function scrapeDiscipline(url) {
     }))
 }
 
-async function scrapeDisciplines() {
+export async function scrapeDisciplines() {
     const html = await axios.get(`${baseUrl}/wiki/Martial_Disciplines`)
     const $ = await cheerio.load(html.data)
     const disciplineLinks = []

@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { XMLParser, XMLBuilder, XMLValidator } from 'fast-xml-parser'
+import {XMLBuilder} from 'fast-xml-parser'
 
 function generateSpellId(name) {
     return name.replace(/[^A-Za-z0-9]/g, '').toLowerCase()
@@ -76,7 +76,7 @@ function generateManeuverTuple(rawManeuver) {
     ]
 }
 
-function convertManuversToXml(manuvers) {
+export function convertManuversToXml(maneuvers) {
     const convertedManeuvers = [Object.fromEntries(maneuvers.map(maneuver => generateManeuverTuple(maneuver)))]
 
     const options = {
